@@ -1,0 +1,12 @@
+{
+    "name": "daniel/blog_importer",
+    "authors": [
+        {
+            "name": "Daniel Briffa",
+            "email": "danielbriffa@live.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^4.1"
+    }
+}
