@@ -8,5 +8,11 @@
     ],
     "require": {
         "vlucas/phpdotenv": "^4.1"
+    },
+    "autoload": {        
+        "files": [
+            "helpers\/helpers.php",
+            "src\/importer.php"
+        ]
     }
 }
