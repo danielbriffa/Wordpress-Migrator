@@ -30,6 +30,7 @@ function makeCurlCall($username, $password, $url, $data)
         curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt( $ch, CURLOPT_HTTPHEADER, [
+            //'Content-Disposition: form-data;',
             'Content-Disposition: form-data; filename="example.jpg"',
             'Authorization: Basic ' . base64_encode( $username . ':' . $password ),
         ] );

@@ -12,7 +12,7 @@
     "autoload": {        
         "files": [
             "helpers\/helpers.php",
-            "src\/importer.php"
+            "src\/migrator.php"
         ]
     }
 }

@@ -10,5 +10,5 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 //init and run app
-$wordpress_migrator = new WordpressMigrator();
+$wordpress_migrator = new Migrator(getenv('IMPORTER'));
 $wordpress_migrator->run();
