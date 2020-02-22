@@ -1,5 +1,7 @@
 <?php
 
+use importers\WordpressImporter;
+
 Class Migrator {
 
   protected $importer;
@@ -24,8 +26,8 @@ Class Migrator {
     $this->new_domain = getenv('NEW_DOMAIN'); 
     $this->wp_media_url = getenv('WP_MEDIA_URL'); 
     $this->wp_post_url = getenv('WP_POST_URL'); 
-    $this->username = 'admin'; //getenv('USERNAME');
-    $this->password = getenv('PASSWORD');
+    $this->username = getenv('WP_USERNAME');
+    $this->password = getenv('WP_PASSWORD');
   }
 
   function loadImporter($_importer, $_origin_url)
@@ -44,18 +46,40 @@ Class Migrator {
   function run()
   {        
     //get data
-    $data = $this->importer->getContentData();
+    $blogs = $this->importer->getBlogs();
 
-    //if setting is on, change urls and update content before inserting new post
-    if (getenv('CHANGE_URLS'))
+    foreach($blogs as $blog)
     {
-      $urls_to_replace = $this->extractUrlsFromStringToReplace($data);
 
-      $this->importer->replaceContent($urls_to_replace);
+      //if var is not of type Blog, skip execution
+      if (!$this->isBlogObject($blog))
+      {
+        var_dump($blog);
+        continue;
+      }
+
+      //if setting is on, change urls and update content before inserting new post    
+      if (getenv('CHANGE_URLS'))
+      {
+        $urls_to_replace = $this->extractUrlsFromStringToReplace($blog->getContent());
+
+        foreach ($urls_to_replace as $old_term=>$new_term)
+        {
+            $data = str_replace($old_term, $new_term, $blog->getContent());
+            $blog->setContent($data);
+        }
+      }
+
+      $this->insertPost($blog);
+
     }
 
-    //insert posts
-    $this->insertPost($json);
+  }
+
+  function isBlogObject($object)
+  {
+    //if var is not of type Blog
+    return ($object instanceof objects\Blog);
   }
 
   /**
@@ -64,11 +88,12 @@ Class Migrator {
   function extractUrlsFromStringToReplace($_data)
   {
     //Extract URLs
-    $urls = getUrlsFromString($data);
+    $urls = getUrlsFromString($_data);
 
     //Remove dupliactes
     $unique_urls = array_unique($urls);
 
+    $urls_to_replace = [];
     foreach($unique_urls as $url) 
     {      
       //Check if URL is of image
@@ -83,7 +108,7 @@ Class Migrator {
           }
 
           $uploaded_image_url = $this->transferMedia($url);
-          $urls_to_replace[$url] = $uploaded_image_url;;
+          $urls_to_replace[$url] = $uploaded_image_url;
         }
         catch(Exception $e){
           var_dump($e);
@@ -103,121 +128,26 @@ Class Migrator {
   {
     //get image and call destination api to store image
     $image = file_get_contents($_url);
+    $image_name = basename($_url);
     //store it
-    $response = makeCurlCall($this->username, $this->password, $this->wp_media_url, $image);
+    $response = makeCurlCall($this->username, $this->password, $this->wp_media_url, $image,  ['Content-Disposition: form-data; filename="'.$image_name.'"']);
 
     //GET THE URL OF THE NEWLY UPLOADED IMAGE
     return $response->guid->rendered; 
   }
 
-  function insertPost($json)
-  {
-    
-    $json = json_decode($json);
-    var_dump($json);
-
+  function insertPost($post)
+  {    
     $data = [
-      'date' => $json->date,
-      'slug' => $json->slug,
-      'status' => $json->status,
-      'title' => $json->title,
-      'content' => $json->content,
-      'excerpt' => '',
-      'featured_media' => '',
-      'categories' => '',
-      'tags' => ''
+      'date' => $post->getDate(),
+      'slug' => $post->getSlug(),
+      'status' => $post->getStatus(),
+      'title' => $post->getTitle(),
+      'content' => $post->getContent(),
+      'excerpt' => $post->getExcerpt()
     ];
-
+    
     $response = makeCurlCall($this->username, $this->password, $this->wp_post_url, $data);
   }
 
-
 }
-
-
-
-/*
-include_once('helpers.php');
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-const ORIGIN_BLOG_URL = '###/wp-json/wp/v2/posts';
-const DESTINATION_WORDPRESS_REST_URL = 'http://localhost:8080/wp-json/';
-
-const OLD_DOMAIN = '###';
-const NEW_DOMAIN = 'localhost:8080';
-
-const WP_MEDIA_URL = DESTINATION_WORDPRESS_REST_URL.'wp/v2/media/';
-const WP_POST_URL = '';
-
-const USERNAME = '###';
-const PASSWORD = '###';
-
-$urls_to_replace = [];
-
-//Get Posts
-$json = stripcslashes(file_get_contents(ORIGIN_BLOG_URL));
-
-//Extract URLs
-$urls = getUrlsFromString($json);
-//Remove dupliactes
-$unique_urls = array_unique($urls);
-
-foreach($unique_urls as $url) 
-{
-
-  //Check if URL is of image
-  if(urlIsImage($url))
-  {
-    try
-    {
-      //get image and call destination api to store image
-      $image = file_get_contents($url);
-      
-      $response = makeCurlCall(USERNAME, PASSWORD, WP_MEDIA_URL, $image);
-
-      $uploaded_image_url = $response->guid->rendered; //TO DO -- GET THE URL OF THE NEWLY UPLOADED IMAGE
-
-      $urls_to_replace[$url] = $uploaded_image_url;
-
-      break;
-    }
-    catch(Exception $e){
-      var_dump($e);
-    }        
-  }
-  else 
-  {
-    //if url is not an image, in case it is an internal link, replace with new domain
-    $urls_to_replace[$url] = str_replace(OLD_DOMAIN, NEW_DOMAIN, $url);
-  }
-}
-
-//replace urls in JSON response
-foreach ($urls_to_replace as $old_url=>$new_url)
-{
-  $json = str_replace($old_url, $new_url, $json);
-}
-
-//insert posts
-var_dump($json);
-
-
-
-//plan
-
-//go through array and extract URLs
-
-//Loop through array 
-  //if attachment
-    //Retrieve attachements 
-    //store them locally
-    //update old domain to new
-  //if link
-    //update old domain to new
-
-//update json with new references
-
-//insert post
-*/

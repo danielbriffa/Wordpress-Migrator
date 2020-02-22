@@ -12,7 +12,10 @@
     "autoload": {        
         "files": [
             "helpers\/helpers.php",
-            "src\/migrator.php"
-        ]
+            "src\/migrator.php",
+            "src\/objects\/blog.php"
+        ],
+        "classmap": ["src\/importers"]
+        
     }
 }

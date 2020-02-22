@@ -1,42 +1,49 @@
 <?php
+
+namespace importers;
+
+use objects\Blog;
+
 class WordpressImporter implements ImporterInterface {
 
     protected $origin_url;
     protected $content_raw;
-    protected $content_parsed;
+    protected $blogs = [];
 
     function __construct($_origin_url)
     {
-       $this->origin_url = $_origin_url;
-       $this->content_raw = stripcslashes(file_get_contents($this->origin_url));
+        $this->origin_url = $_origin_url;
+        $this->content_raw = json_decode(file_get_contents($this->origin_url));  
+
+        $this->extractBlogsFromRawContent();
     }
 
-    function getContentData()
+    function getRawContentData()
     {
        return $this->content_raw;
     }
 
-    function getSlug()
+    function getBlogs()
     {
-        return (json_decode($this->content_raw))->slug;
+        return $this->blogs;
     }
-    
-    function getContent()
+
+    private function extractBlogsFromRawContent()
     {
-        return (json_decode($this->content_raw))->content;
-    }
-    
-    function getDate()
-    {
-        return (json_decode($this->content_raw))->date;
-    }
-    
-    function replaceContent($_array_replace)
-    {
-        foreach ($_array_replace as $old_term=>$new_term)
+        $posts = $this->getRawContentData();
+
+        foreach($posts as $post)
         {
-            $data = str_replace($old_term, $new_term, $this->content_raw);
-            $this->content_raw = $data;
+            $blog = new Blog();
+
+            $blog->setTitle($post->title->rendered);
+            $blog->setSlug($post->slug);
+            $blog->setDate($post->date);
+            $blog->setStatus($post->status);
+            $blog->setContent(stripcslashes($post->content->rendered));
+            $blog->setExcerpt(stripcslashes($post->excerpt->rendered));
+            
+            array_push($this->blogs, $blog);
         }
     }
 }

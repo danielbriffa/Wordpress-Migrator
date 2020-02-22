@@ -1,11 +1,9 @@
 <?php
 
+namespace importers;
+
 interface ImporterInterface {
   
-    function getContentData();
-    function getSlug();
-    function getContent();
-    function getDate();
-    function replaceContent();
-    //function updateContent();
+    function getRawContentData();
+    function getBlogs();
 }

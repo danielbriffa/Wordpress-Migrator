@@ -19,7 +19,7 @@ function urlIsImage($url)
     return false;
 }
 
-function makeCurlCall($username, $password, $url, $data)
+function makeCurlCall($username, $password, $url, $data, $headers = [])
 {
     try
     {
@@ -29,22 +29,21 @@ function makeCurlCall($username, $password, $url, $data)
         curl_setopt( $ch, CURLOPT_POST, 1 );
         curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt( $ch, CURLOPT_HTTPHEADER, [
-            //'Content-Disposition: form-data;',
-            'Content-Disposition: form-data; filename="example.jpg"',
-            'Authorization: Basic ' . base64_encode( $username . ':' . $password ),
-        ] );
+        curl_setopt( $ch, CURLOPT_HTTPHEADER, array_merge([
+            'Authorization: Basic ' . base64_encode( $username . ':' . $password )
+        ], $headers) );
     
         $result = curl_exec( $ch );
 
         curl_close( $ch );
 
+        var_dump($result);        
         return json_decode($result);
         
     }
     catch(Exception $e)
     {
-        var_dump($e);
+        var_dump($e->getMessage());
     }
 }
 
