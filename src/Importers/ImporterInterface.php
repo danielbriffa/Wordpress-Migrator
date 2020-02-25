@@ -2,8 +2,7 @@
 
 namespace importers;
 
-interface ImporterInterface {
-  
-    function getRawContentData();
+interface ImporterInterface 
+{  
     function getBlogs();
 }

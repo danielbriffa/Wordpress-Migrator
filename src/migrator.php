@@ -1,12 +1,9 @@
 <?php
 
-use importers\WordpressImporter;
-
 Class Migrator {
 
   protected $importer;
 
-  protected $origin_blog_url;
   protected $destination_wordpress_rest_url;
   protected $old_domain;
   protected $new_domain;
@@ -17,9 +14,7 @@ Class Migrator {
   
 
   function __construct($_importer) {
-    $this->origin_blog_url = getenv('ORIGIN_BLOG_URL'); 
-
-    $this->loadImporter($_importer, $this->origin_blog_url);
+    $this->loadImporter($_importer);
 
     $this->destination_wordpress_rest_url = getenv('DESTINATION_WORDPRESS_REST_URL'); 
     $this->old_domain = getenv('OLD_DOMAIN'); 
@@ -30,12 +25,15 @@ Class Migrator {
     $this->password = getenv('WP_PASSWORD');
   }
 
-  function loadImporter($_importer, $_origin_url)
+  function loadImporter($_importer)
   {
     switch($_importer) 
     {
       case 'wordpress':
-          $this->importer = new WordpressImporter($_origin_url);
+          $this->importer = new importers\WordpressImporter(getenv('ORIGIN_BLOG_URL'));
+        break;
+      case 'wbwgn':
+          $this->importer = new importers\WbWgnImporter(getenv('DB_DSN'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
         break;
       default:
           throw new Exception('Importer does not exist');
@@ -54,7 +52,7 @@ Class Migrator {
       //if var is not of type Blog, skip execution
       if (!$this->isBlogObject($blog))
       {
-        var_dump($blog);
+        echo '------ Blog Object not of type Blog ! Skipping iteration ------';
         continue;
       }
 
@@ -73,7 +71,6 @@ Class Migrator {
       $this->insertPost($blog);
 
     }
-
   }
 
   function isBlogObject($object)
