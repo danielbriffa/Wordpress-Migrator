@@ -12,11 +12,11 @@ class WbWgnImporter implements ImporterInterface
     protected $content_raw;
     protected $blogs = [];
 
-    function __construct($dsn, $user, $pass)
+    function __construct($dsn, $user, $pass, $show, $page)
     {
         $this->pdo = $this->getPdoConnection($dsn, $user, $pass);
 
-        $this->loadBlogsFromDb();
+        $this->loadBlogsFromDb($show, $page);
     }
 
     function getRawContentData()
@@ -48,13 +48,13 @@ class WbWgnImporter implements ImporterInterface
         }
     }
 
-    private function loadBlogsFromDb()
+    private function loadBlogsFromDb($show, $page)
     {
         $stmt = $this->pdo->query('SELECT e.channel_id, e.status, et.slug, et.title, et.excerpt, et.content
                                     FROM entry_translations et
                                     JOIN entries e
                                     ON e.id = et.entry_id
-                                    WHERE e.channel_id IN (1,2) LIMIT 1'
+                                    WHERE e.channel_id IN (1,2) LIMIT '.$page.','.$show
                                 );
 
         while ($row = $stmt->fetch())
@@ -83,7 +83,7 @@ class WbWgnImporter implements ImporterInterface
     private function payloadModifier($data)
     {
         $data = $this->statusMapping($data);
-        $data['content'] = $this->updateImageUrlsFullUrl($data);
+        $data = $this->updateImageUrlsFullUrl($data);
 
         return $data;
     }

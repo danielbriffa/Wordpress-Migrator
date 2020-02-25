@@ -33,7 +33,7 @@ Class Migrator {
           $this->importer = new importers\WordpressImporter(getenv('ORIGIN_BLOG_URL'));
         break;
       case 'wbwgn':
-          $this->importer = new importers\WbWgnImporter(getenv('DB_DSN'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'));
+          $this->importer = new importers\WbWgnImporter(getenv('DB_DSN'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('AMOUNT'), getenv('PAGE'));
         break;
       default:
           throw new Exception('Importer does not exist');
