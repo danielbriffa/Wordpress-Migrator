@@ -18,11 +18,6 @@ class WordpressImporter implements ImporterInterface {
         $this->extractBlogsFromRawContent();
     }
 
-    function getRawContentData()
-    {
-       return $this->content_raw;
-    }
-
     function getBlogs()
     {
         return $this->blogs;
@@ -30,7 +25,7 @@ class WordpressImporter implements ImporterInterface {
 
     private function extractBlogsFromRawContent()
     {
-        $posts = $this->getRawContentData();
+        $posts = $this->content_raw;
 
         foreach($posts as $post)
         {

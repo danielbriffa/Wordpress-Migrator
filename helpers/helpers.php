@@ -3,8 +3,16 @@
 //https://gist.github.com/jermity/af85cdcaabdb36f96173
 function getUrlsFromString($string) 
 {
-    $regex = '/https?\:\/\/[^\" \n]+/i';
-    preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $string, $match);
+    $regex = '#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#';
+    preg_match_all($regex, $string, $match);
+    
+    return $match[0];
+}
+
+function getRelativeUrlsFromString($string)
+{
+    $regex = '#[\"|\'](\/)([^\/].+?)[\"|\']#';
+    preg_match_all($regex, $string, $match);
     
     return $match[0];
 }
