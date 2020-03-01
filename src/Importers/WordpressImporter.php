@@ -1,8 +1,9 @@
 <?php
 
-namespace importers;
+namespace DannyBriff\importers;
 
-use objects\Blog;
+use DannyBriff\objects\Blog;
+use DannyBriff\importers\ImporterInterface;
 
 class WordpressImporter implements ImporterInterface {
 

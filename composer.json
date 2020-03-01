@@ -13,6 +13,7 @@
         "files": [
             "helpers\/helpers.php",
             "src\/migrator.php",
+            "src\/dom_modifier.php",
             "src\/objects\/blog.php"
         ],
         "classmap": ["src\/importers"]
