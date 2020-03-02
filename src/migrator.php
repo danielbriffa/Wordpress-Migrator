@@ -1,5 +1,9 @@
 <?php
 
+namespace DannyBriff;
+
+use DannyBriff\DomModifier;
+
 Class Migrator {
 
   protected $importer;
@@ -30,10 +34,10 @@ Class Migrator {
     switch($_importer) 
     {
       case 'wordpress':
-          $this->importer = new importers\WordpressImporter(getenv('ORIGIN_BLOG_URL'));
+          $this->importer = new \DannyBriff\importers\WordpressImporter(getenv('ORIGIN_BLOG_URL'));
         break;
       case 'wbwgn':
-          $this->importer = new importers\WbWgnImporter(getenv('DB_DSN'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('AMOUNT'), getenv('PAGE'));
+          $this->importer = new \DannyBriff\importers\WbWgnImporter(getenv('DB_DSN'), getenv('DB_USERNAME'), getenv('DB_PASSWORD'), getenv('AMOUNT'), getenv('PAGE'));
         break;
       default:
           throw new Exception('Importer does not exist');
@@ -57,7 +61,7 @@ Class Migrator {
       }
 
       //if setting is on, change urls and update content before inserting new post    
-      if (getenv('CHANGE_URLS'))
+      if (getenv('CHANGE_URLS') != 'false')
       {
         $urls_to_replace = $this->extractUrlsFromStringToReplace($blog->getContent());
 
@@ -66,6 +70,25 @@ Class Migrator {
             $data = str_replace($old_term, $new_term, $blog->getContent());
             $blog->setContent($data);
         }
+      }
+      
+      //execute html modifications
+      if ($modification = json_decode(getenv('HTML_MODIFICATIONS'), true))
+      {
+        $dom_modifier = new DomModifier($blog->getContent());
+
+        foreach($modification as $key => $value)
+        {
+          $dom_modifier->wrap_elements($key, $value['wrapper']);
+
+          foreach($value['attributes'] as $attribute_name => $attribute_payload)
+          {
+            $dom_modifier->add_attribute($key, $attribute_name, explode(' ', $attribute_payload['add']))
+                         ->remove_attribute($key, $attribute_name, explode(' ', $attribute_payload['remove']));
+          }                      
+        }    
+        
+        $blog->setContent($dom_modifier->get_html_content());
       }
 
       $this->insertPost($blog);

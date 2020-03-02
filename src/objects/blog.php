@@ -1,6 +1,6 @@
 <?php
 
-namespace objects;
+namespace DannyBriff\objects;
 
 class Blog {
 

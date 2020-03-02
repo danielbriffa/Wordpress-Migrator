@@ -13,7 +13,7 @@ Destination Wordpress Instance (where blogs would be migrated to)
 ## Process is synchronous and is quite slow (especially if importing images and a single blog post have multiple images). Recommended you execute the script for 5 posts only.
 
 
-#Create a new importer
+# Create a new importer
 
 1. Create a new class in importers, implementing interface -> ImporterInterface
 
@@ -22,3 +22,26 @@ Destination Wordpress Instance (where blogs would be migrated to)
 3. Update loadImporter method in migrator.php. Just add a new case statement, to initialize your new importer
 
 Thats It ! :) 
+
+
+# .env details
+
+HTML_MODIFICATION - 
+
+{
+    "img":
+    {
+        "wrapper": {
+            "element":"div",
+            "attributes": {
+                "class": "feature"       
+            }
+        },
+        "attributes": {
+            "class": {
+                "add":"img-responsive",
+                "remove":"img"
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 <?php
 
-namespace importers;
+namespace DannyBriff\importers;
 
 interface ImporterInterface 
 {  
