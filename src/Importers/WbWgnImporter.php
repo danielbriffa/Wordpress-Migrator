@@ -51,13 +51,14 @@ class WbWgnImporter implements ImporterInterface
 
     private function loadBlogsFromDb($show, $page)
     {
-        $stmt = $this->pdo->query('SELECT e.channel_id, e.status, et.slug, et.title, et.excerpt, et.content
+        $stmt = $this->pdo->prepare('SELECT e.channel_id, e.status, et.slug, et.title, et.excerpt, et.content
                                     FROM entry_translations et
                                     JOIN entries e
                                     ON e.id = et.entry_id
-                                    WHERE e.channel_id IN (1,2) LIMIT '.$page.','.$show
+                                    WHERE e.channel_id IN (:channels) LIMIT :page, :show'
                                 );
-
+        $stmt->execute(['channels' => getenv('CHANNEL_IDS'), 'page' => $page, 'show' => $show]);
+        
         while ($row = $stmt->fetch())
         {
             $this->extractBlogsFromRawContent($row);
