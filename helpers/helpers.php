@@ -43,9 +43,15 @@ function makeCurlCall($username, $password, $url, $data, $headers = [])
     
         $result = curl_exec( $ch );
 
+        $test = curl_error($ch);
+        
         curl_close( $ch );
 
-        var_dump($result);        
+        if ($result == false)
+            echo 'FAIL - '.$test. ' URL - '.$url.PHP_EOL;
+        else 
+            echo 'SUCCESS - '.$url.PHP_EOL;
+     
         return json_decode($result);
         
     }
