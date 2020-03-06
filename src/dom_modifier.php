@@ -18,15 +18,17 @@ class DomModifier {
         if (!$this->html instanceof \DOMDocument)
         {
             $this->html = new \DOMDocument();
+            $this->html->strictErrorChecking = false;
+            $this->html->substituteEntities = false;
+            $this->html->encoding = 'utf-8';
         }
-        
         return $this->html;
     }
 
     public function set_html_content($_html)
-    {
-        $this->get_html()
-             ->loadHTML($_html);
+    {        
+        @$this->get_html()
+             ->loadHTML(mb_convert_encoding($_html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     }
 
     public function get_html_content() 
