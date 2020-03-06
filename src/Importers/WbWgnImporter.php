@@ -51,11 +51,11 @@ class WbWgnImporter implements ImporterInterface
 
     private function loadBlogsFromDb($show, $page)
     {
-        $stmt = $this->pdo->prepare('SELECT e.channel_id, e.status, et.slug, et.title, et.excerpt, et.content
+        $stmt = $this->pdo->prepare('SELECT e.channel_id, e.status, e.published_at, et.slug, et.title, et.excerpt, et.content
                                     FROM entry_translations et
                                     JOIN entries e
                                     ON e.id = et.entry_id
-                                    WHERE e.channel_id IN (:channels) LIMIT :page, :show'
+                                    WHERE e.channel_id IN (:channels) AND e.deleted_at IS NULL LIMIT :page, :show'
                                 );
         $stmt->execute(['channels' => getenv('CHANNEL_IDS'), 'page' => $page, 'show' => $show]);
         
@@ -74,7 +74,7 @@ class WbWgnImporter implements ImporterInterface
 
         $blog->setTitle($data['title']);
         $blog->setSlug($data['slug']);
-        $blog->setDate(date("Y-m-d H:i:s"));
+        $blog->setDate($data['published_at']);
         $blog->setStatus($data['status']);
         $blog->setContent(stripcslashes($data['content']));
         $blog->setExcerpt(stripcslashes($data['excerpt']));
