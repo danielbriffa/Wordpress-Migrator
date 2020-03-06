@@ -1,4 +1,8 @@
-# Setup
+# Wordpress Migrator
+
+Import contents into your wordpress instance from another wordpress instance through API. (Can also be extended to other CMS, example. Drupal to Wordpress
+
+## Setup
 
 Destination Wordpress Instance (where blogs would be migrated to)
 
@@ -10,10 +14,10 @@ Destination Wordpress Instance (where blogs would be migrated to)
 
 4. Execute 'php index.php' in terminal or load index.php from browser
 
-## Process is synchronous and is quite slow (especially if importing images and a single blog post have multiple images). Recommended you execute the script for 5 posts only.
+**Process is synchronous and is quite slow (especially if importing images and a single blog post have multiple images). Recommended tofirst eveluate the speed it runs, and adjust the amount it imports accordingly**
 
 
-# Create a new importer
+## Create a new importer
 
 1. Create a new class in importers, implementing interface -> ImporterInterface
 
@@ -24,7 +28,7 @@ Destination Wordpress Instance (where blogs would be migrated to)
 Thats It ! :) 
 
 
-# .env details
+## .env details
 
 HTML_MODIFICATION - 
 
