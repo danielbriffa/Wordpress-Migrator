@@ -81,10 +81,13 @@ Class Migrator {
         {
           $dom_modifier->wrap_elements($key, $value['wrapper']);
 
-          foreach($value['attributes'] as $attribute_name => $attribute_payload)
+          if (isset($value['attributes']))
           {
-            $dom_modifier->add_attribute($key, $attribute_name, explode(' ', $attribute_payload['add']))
-                         ->remove_attribute($key, $attribute_name, explode(' ', $attribute_payload['remove']));
+            foreach($value['attributes'] as $attribute_name => $attribute_payload)
+            {
+              $dom_modifier->add_attribute($key, $attribute_name, explode(' ', $attribute_payload['add']))
+                          ->remove_attribute($key, $attribute_name, explode(' ', $attribute_payload['remove']));
+            }
           }                      
         }    
         
