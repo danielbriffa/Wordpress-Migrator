@@ -131,7 +131,8 @@ Class Migrator {
           }
 
           $uploaded_image_url = $this->transferMedia($url);
-          $urls_to_replace[$url] = $uploaded_image_url;
+          //GET THE URL OF THE NEWLY UPLOADED IMAGE
+          $urls_to_replace[$url] = $uploaded_image_url->guid->rendered;
         }
         catch(Exception $e){
           var_dump($e);
@@ -154,16 +155,32 @@ Class Migrator {
     $image_name = basename($_url);
     //store it
     $response = makeCurlCall($this->username, $this->password, $this->wp_media_url, $image,  ['Content-Disposition: form-data; filename="'.$image_name.'"']);
+    
+    return $response; 
+  }
 
-    //GET THE URL OF THE NEWLY UPLOADED IMAGE
-    return $response->guid->rendered; 
+  function insertAndSetFeaturedImage($post)
+  {
+    if ($post->getFeaturedImage() !== null && trim($post->getFeaturedImage()) !== '')
+    {
+      //upload image
+      $image = $this->transferMedia($post->getFeaturedImage());
+      //retrieve newly uploaded image id
+      $post->setFeaturedImage($image->id);
+    }
+
+    return $post;
   }
 
   function insertPost($post)
   {    
+
+    $post = $this->insertAndSetFeaturedImage($post);
+
     $data = [
       'date' => $post->getDate(),
       'slug' => $post->getSlug(),
+      'featured_media' => $post->getFeaturedImage(),
       'status' => $post->getStatus(),
       'title' => $post->getTitle(),
       'content' => $post->getContent(),
