@@ -7,6 +7,7 @@ class Blog {
     protected $title; 
     protected $slug; 
     protected $date; 
+    protected $featured_image;
     protected $status; 
     protected $content; 
     protected $excerpt; 
@@ -36,6 +37,16 @@ class Blog {
     public function setDate($value)
     {
         $this->date = $value;
+    }
+
+    public function getFeaturedImage()
+    {
+        return $this->featured_image;
+    }
+
+    public function setFeaturedImage($value)
+    {
+        $this->featured_image = $value;
     }
 
     public function getStatus()

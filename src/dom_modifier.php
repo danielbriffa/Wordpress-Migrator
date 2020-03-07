@@ -27,6 +27,9 @@ class DomModifier {
 
     public function set_html_content($_html)
     {        
+        //@ - supress warnings
+        //mb_convert_encoding - change encoding (to correctly parse all characters)
+        //LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD - do not enclose in doctype, html & body tags. load as is.
         @$this->get_html()
              ->loadHTML(mb_convert_encoding($_html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     }
